@@ -37,8 +37,16 @@
     @brief  Instantiates a new Adafruit_BNO055 class
 */
 /**************************************************************************/
-Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address, TwoWire &w): _Wire(w)
+Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address): _Wire(Wire)
 {
+   _default_2wire = true;
+  _sensorID = sensorID;
+  _address = address;
+}
+
+Adafruit_BNO055::Adafruit_BNO055(TwoWire &w, int32_t sensorID, uint8_t address): _Wire(w)
+{
+   _default_2wire = false;
   _sensorID = sensorID;
   _address = address;
 }
@@ -54,8 +62,9 @@ Adafruit_BNO055::Adafruit_BNO055(int32_t sensorID, uint8_t address, TwoWire &w):
 /**************************************************************************/
 bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
 {
-  /* Enableing I2C has to be done outside */
-  // _Wire.begin();
+  /* Enableing I2C has to be done before if not using the default Wire */
+   if(_default_2wire)
+     _Wire.begin();
 
   // BNO055 clock stretches for 500us or more!
 #ifdef ESP8266
